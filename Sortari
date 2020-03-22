@@ -1,0 +1,283 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+ofstream fout ("sortare.out");
+
+vector <int> a;
+int n, op;
+
+void Afisare(vector<int> q)
+{
+    for (vector<int>::iterator it = q.begin(); it != q.end(); it++)
+        fout << *it << " ";
+    fout << "\n";
+}
+
+void BubbleSort()
+{ /// Bubble sort cu iteratori
+    vector<int>::iterator i;
+    vector<int>::iterator j;
+
+    for (i = a.begin(); i < a.end() - 1; i++)
+        for (j = i + 1; j < a.end(); j++)
+            if ((*i) >= (*j))
+                iter_swap(i, j);
+}
+
+void CountSort()
+{
+    int i, k, maxim = -1;
+    vector<int>::iterator j = a.begin();
+
+    for (i = 0; i < int(a.size()); i++)
+        if (a[i] > maxim)
+            maxim = a[i];
+
+    vector <int> c(maxim + 2);
+
+    for (i = 0; i < int(a.size()); i++)
+        c[a[i]]++;
+
+    for (i = 0; i <= maxim; i++)
+        for (k = 1; k <= c[i]; k++)
+        {
+            *j = i;
+            //cout << *j << " ";
+            j++;
+        }
+}
+
+void Afisare(vector<int>::iterator s,
+             vector<int>::iterator f)
+{
+    vector<int>::iterator i;
+    for (i = s; i <= f; i++)
+        cout << *i << " ";
+    cout << "\n";
+}
+
+void Interclasare(vector<int>::iterator s,
+                  vector<int>::iterator mij,
+                  vector<int>::iterator f)
+{
+    int lung;
+
+    /**
+    cout << *s << " " << *mij << " " << *f << "   ";
+    Afisare(s, mij);
+    Afisare(mij, f);
+    cout << "\n";
+    //*/
+    vector<int> c;
+    vector<int>::iterator i = s;
+    vector<int>::iterator j = mij + 1;
+    while (i <= mij && j <= f)
+    {
+        if ((*i) <= (*j))
+        {
+            c.push_back(*i);
+            i++;
+        }
+        else // ((*i) >= (*j))
+        {
+            c.push_back(*j);
+            j++;
+        }
+
+    }
+    while (i <= mij)
+    {
+        c.push_back(*i);
+        i++;
+    }
+    while (j <= f)
+    {
+        c.push_back(*j);
+        j++;
+    }
+    /**
+    for (lung = 0; lung < c.size(); lung++)
+        cout << c[lung] << " ";
+    cout << "\n";
+    //*/
+    i = s;
+    lung = 0;
+    while (i <= f)
+    {
+        *i = c[lung++];
+        i++;
+    }
+}
+
+void MergeSort(vector<int>::iterator i, vector<int>::iterator j)
+{
+    if (j - i < 1) return;
+    else
+    {
+        vector<int>::iterator mij = i + distance(i, j) / 2 ;
+        /**
+        cout << *i << " " << *mij << "         " << *(mij + 1) << " " << *j << "\n";
+        //*/
+        MergeSort(i, mij);
+        MergeSort(mij + 1, j);
+        Interclasare(i, mij, j);
+    }
+}
+
+void SWAP(vector<int>::iterator x, vector<int>::iterator y)
+{
+    int aux = *x;
+    *x = *y;
+    *y = aux;
+}
+
+void QuickSort(vector<int>::iterator st, vector<int>::iterator dr)
+{
+    vector<int>::iterator mij = st + distance(st, dr) / 2;
+    int pivot = (*mij);
+    vector<int>::iterator i = st;
+    vector<int>::iterator j = dr;
+
+    while (i < dr || j > st)
+    {
+        while ((*i) < pivot)
+            i++;
+        while ((*j) > pivot)
+            j--;
+
+        if (i <= j)
+        {
+            /**
+            SWAP(i, j);
+            //*/
+            //**
+            iter_swap(i, j);
+            //*/
+            i++;
+            j--;
+        }
+        else
+        {
+            if (i < dr)
+            {
+                ///Afisare(i, dr);
+                QuickSort(i, dr);
+            }
+            if (j > st)
+            {
+                ///Afisare(st, j);
+                QuickSort(st, j);
+            }
+            return;
+        }
+    }
+}
+
+void CountSort_RadixSort(int cifra, int baza)
+{
+    vector<int> aux (a.size(), 0);
+    vector<int> c(baza, 0);
+    int i;
+
+    for (i = 0; i < int(a.size()); i++)
+        c[ (a[i]/cifra) % baza ]++;
+
+    for (i = 1; i < baza; i++)
+        c[i] += c[i - 1];
+
+    for (i = int(a.size() - 1); i >= 0; i--)
+    {
+        aux[ c[ (a[i]/cifra) % baza] - 1] = a[i];
+        c[ (a[i]/cifra) % 10]--;
+    }
+
+    for (i = 0; i < int(a.size()); i++)
+        a[i] = aux[i];
+}
+
+void RadixSort(int baza)
+{
+    int i, mx = -1;
+    for(i = 0; i < int(a.size()); i++)
+        if (a[i] > mx)
+            mx = a[i];
+
+    for (int cifra = 1; mx / cifra > 0; cifra *= 10)
+        CountSort_RadixSort(cifra, baza);
+}
+
+void Verificare()
+{
+    for (int i = 1; i < (int)a.size(); i++)
+        if (a[i - 1] > a[i])
+        {
+            fout << "NU ESTE SORTAT CORECT!\n";
+            return;
+        }
+    fout << "ESTE SORTAT CORECT!\n";
+}
+
+int main()
+{
+    int x;
+    /**
+    ifstream fin ("sortare.in");
+    while (fin >> x)
+    {
+        a.push_back(x);
+        n++;
+    }
+    ///*/
+
+    //**
+    int optiune, numere, numar_maxim;
+    cin >> optiune >> numere >> numar_maxim;
+    for (int i = 1; i <= numere; i++)
+    {
+        x = (rand() % numar_maxim) + 1;
+        a.push_back(x);
+    }
+    ///*/
+
+    clock_t timer = clock();
+
+    if (optiune == 1)
+        sort(a.begin(),a.end());
+    else if (optiune == 2)
+        BubbleSort();
+    else if (optiune == 3)
+        CountSort();
+    else if (optiune == 4)
+        RadixSort(10);
+    else if (optiune == 5)
+        MergeSort(a.begin(), a.end() - 1);
+    else if (optiune == 6)
+        QuickSort(a.begin(), a.end() - 1);
+
+    timer = clock() - timer;
+
+    Verificare();
+    fout << (float)timer/CLOCKS_PER_SEC << "\n";
+
+    Afisare(a);
+    fin.close();
+    fout.close();
+    return 0;
+}
+
+/**
+numere - 1000
+numar maxim - 1000000
+
+sort() - 0 secunde
+
+BubbleSort() - 0.014 secunde
+
+CountSort() - 0.001 secunde
+
+MergeSort() - 0.002 secunde
+
+QuickSort() - 0 secunde
+
+RadixSort() - 0.001 secunde
+//*/
